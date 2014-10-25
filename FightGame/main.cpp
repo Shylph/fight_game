@@ -142,7 +142,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			if (engine->isEngineRunning())
 				engine->exitEngine();
 			initGame(hWnd);
-			WaitForSingleObject(engine->hEngineThread, 1);
+			WaitForSingleObject(engine->hEngineThread, 2);
 			engine->engineStart();
 		}
 		return 0;

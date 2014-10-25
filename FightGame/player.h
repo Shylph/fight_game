@@ -155,6 +155,7 @@ public:
 		}
 		pe->v = temp;
 	}
+	void winAnimation();
 private:
 	void loadAnimationAll();
 	physicalElement* findBodyMovement(vector p);
@@ -218,6 +219,7 @@ private:
 	void throwBoxAnimation();
 
 	void waitAnimation();
+
 
 };
 

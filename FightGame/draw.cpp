@@ -168,6 +168,12 @@ void drawPerson(HDC hdc, Player p){
 	MoveToEx(hdc, (int)body[0].x + (int)bm[0].position.x + baseX, (int)body[0].y + (int)bm[0].position.y + baseY, NULL);
 	LineTo(hdc, (int)body[1].x + (int)bm[1].position.x + baseX, (int)body[1].y + (int)bm[1].position.y + baseY);
 	LineTo(hdc, (int)body[2].x + (int)bm[2].position.x + baseX, (int)body[2].y + (int)bm[2].position.y + baseY);
+
+	Ellipse(hdc, (int)body[0].x - p.headSize + (int)bm[0].position.x + baseX, (int)body[0].y - p.headSize + (int)bm[0].position.y + baseY, (int)body[0].x + p.headSize + (int)bm[0].position.x + baseX, (int)body[0].y + p.headSize + (int)bm[0].position.y + baseY);
+
+	Ellipse(hdc, (int)body[3].x - p.handSize + (int)bm[3].position.x + baseX, (int)body[3].y - p.handSize + (int)bm[3].position.y + baseY, (int)body[3].x + p.handSize + (int)bm[3].position.x + baseX, (int)body[3].y + p.handSize + (int)bm[3].position.y + baseY);
+	Ellipse(hdc, (int)body[6].x - p.handSize + (int)bm[6].position.x + baseX, (int)body[6].y - p.handSize + (int)bm[6].position.y + baseY, (int)body[6].x + p.handSize + (int)bm[6].position.x + baseX, (int)body[6].y + p.handSize + (int)bm[6].position.y + baseY);
+
 	
 	MoveToEx(hdc, (int)body[3].x + (int)bm[3].position.x + baseX, (int)body[3].y + (int)bm[3].position.y + baseY, NULL);
 	LineTo(hdc, (int)body[4].x + (int)bm[4].position.x + baseX, (int)body[4].y + (int)bm[4].position.y + baseY);
@@ -180,11 +186,6 @@ void drawPerson(HDC hdc, Player p){
 	LineTo(hdc, (int)body[2].x + (int)bm[2].position.x + baseX, (int)body[2].y + (int)bm[2].position.y + baseY);
 	LineTo(hdc, (int)body[9].x + (int)bm[9].position.x + baseX, (int)body[9].y + (int)bm[9].position.y + baseY);
 	LineTo(hdc, (int)body[10].x + (int)bm[10].position.x + baseX, (int)body[10].y + (int)bm[10].position.y + baseY);
-
-	Ellipse(hdc, (int)body[0].x - p.headSize + (int)bm[0].position.x + baseX, (int)body[0].y - p.headSize + (int)bm[0].position.y + baseY, (int)body[0].x + p.headSize + (int)bm[0].position.x + baseX, (int)body[0].y + p.headSize + (int)bm[0].position.y + baseY);
-
-	Ellipse(hdc, (int)body[3].x - p.handSize + (int)bm[3].position.x + baseX, (int)body[3].y - p.handSize + (int)bm[3].position.y + baseY, (int)body[3].x + p.handSize + (int)bm[3].position.x + baseX, (int)body[3].y + p.handSize + (int)bm[3].position.y + baseY);
-	Ellipse(hdc, (int)body[6].x - p.handSize + (int)bm[6].position.x + baseX, (int)body[6].y - p.handSize + (int)bm[6].position.y + baseY, (int)body[6].x + p.handSize + (int)bm[6].position.x + baseX, (int)body[6].y + p.handSize + (int)bm[6].position.y + baseY);
 
 	SelectObject(hdc, hOldPen);
 	DeleteObject(hPen);

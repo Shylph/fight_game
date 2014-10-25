@@ -2,6 +2,76 @@
 extern int life;
 extern struct box missile[20];
 
+void Player::winAnimation(){
+	static double changeSeta = 0;
+	bodyMovement[3].v.x -= 2;
+	bodyMovement[4].v.x -= 2;
+	for (int i = 3; i < 7; i++){
+		bodyMovement[i].v.y -= 4 * sin(changeSeta);
+		changeSeta += 0.01;
+		if (changeSeta > 3.141592){
+			changeSeta = 0;
+		}
+	}
+}
+
+void Player::attackAnimation(){
+	int cntLimt;
+	vector power;
+	vector ** ani;
+	if ((state & PS_HAND_ATTACK_UPPERCUT) == PS_HAND_ATTACK_UPPERCUT){
+		if ((direction & PD_ViEW_LEFT)>0){
+			ani = attAni_uppercut_l;
+		}
+		else{
+			ani = attAni_uppercut_r;
+		}
+		power = { 0.25, -0.85 };
+		cntLimt = att_uppercut_cnt;
+	}
+	else if ((state & PS_HAND_ATTACK) == PS_HAND_ATTACK){
+		if ((direction & PD_ViEW_LEFT)>0){
+			ani = attAni_l;
+		}
+		else{
+			ani = attAni_r;
+		}
+		power = { 1.3, 0 };
+		cntLimt = attCnt;
+	}
+
+	static bool collsion = false;
+
+	if ((!isCancelAttack()) && (collsion == false) && (currentAttCnt <= cntLimt)){
+		setBodyArm(ani[currentAttCnt++]);
+		body[3].v.x += -1 * power.x;
+		body[3].v.y += power.y;
+		body[6].v += power;
+	}
+	else if (collsion){
+		//»¬‹š Èûµµ »¬ °Í!!!!!!!!
+		body[3].v.x *= 0.7;
+		body[3].v.y *= 0.7;
+		body[6].v.x *= 0.7;
+		body[6].v.y *= 0.7;
+		//
+		setBodyArm(ani[currentAttCnt--]);
+	}
+	else{
+		collsion = true;
+		setBodyArm(ani[currentAttCnt--]);
+	}
+	if ((currentAttCnt == -1) || (currentAttCnt == cntLimt)){
+		currentAttCnt = 0;
+		collsion = false;
+		state = state&(~(PS_ATTACK | PS_HAND_ATTACK | PS_HAND_ATTACK_UPPERCUT));
+		state = state | ((PS_ATTACK_CANCEL) | (PS_ATTACK_FINISH));
+		body[3].v = { 0, 0 };
+		body[6].v = { 0, 0 };
+	}
+
+}
+
 void Player::deadlyBlowAnimation(){
 	int cntLimt;
 	static bool firstFlag = true;
@@ -86,7 +156,7 @@ bool Player::damagedDelay(){
 	QueryPerformanceFrequency(&freq);
 	elapse = elapse + ((double)(after.QuadPart - before.QuadPart)) / ((double)freq.QuadPart);
 	before = after;
-	double interval = 0.1;
+	double interval = 0.075;
 	if (elapse > interval){
 		elapse = elapse - interval;
 		return true;
@@ -224,62 +294,6 @@ void Player::attackFootAnimation(){
 
 }
 
-void Player::attackAnimation(){
-	int cntLimt;
-	vector power;
-	vector ** ani;
-	if ((state & PS_HAND_ATTACK_UPPERCUT) == PS_HAND_ATTACK_UPPERCUT){
-		if ((direction & PD_ViEW_LEFT)>0){
-			ani = attAni_uppercut_l;
-		}
-		else{
-			ani = attAni_uppercut_r;
-		}
-		power = { 0.25, -0.85 };
-		cntLimt = att_uppercut_cnt;
-	}
-	else if ((state & PS_HAND_ATTACK) == PS_HAND_ATTACK){
-		if ((direction & PD_ViEW_LEFT)>0){
-			ani = attAni_l;
-		}
-		else{
-			ani = attAni_r;
-		}
-		power = { 1.3, 0 };
-		cntLimt = attCnt;
-	}
-
-	static bool collsion = false;
-	
-	if ((!isCancelAttack()) && (collsion == false) && (currentAttCnt <= cntLimt)){
-		setBodyArm(ani[currentAttCnt++]);
-		body[3].v.x += -1 * power.x;
-		body[3].v.y +=  power.y;
-		body[6].v += power;
-	}
-	else if (collsion){
-		//»¬‹š Èûµµ »¬ °Í!!!!!!!!
-		body[3].v.x *= 0.7 ;
-		body[3].v.y *= 0.7;
-		body[6].v.x *= 0.7;
-		body[6].v.y *= 0.7;
-		//
-		setBodyArm(ani[currentAttCnt--]);
-	}
-	else{
-		collsion = true;
-		setBodyArm(ani[currentAttCnt--]);
-	}
-	if ((currentAttCnt == -1) || (currentAttCnt == cntLimt)){
-		currentAttCnt = 0;
-		collsion = false;
-		state = state&(~(PS_ATTACK | PS_HAND_ATTACK | PS_HAND_ATTACK_UPPERCUT));
-		state = state | ((PS_ATTACK_CANCEL) | (PS_ATTACK_FINISH));
-		body[3].v = { 0, 0 };
-		body[6].v = { 0, 0 };
-	}
-	
-}
 
 
 void Player::walkAnimation(){
@@ -423,33 +437,43 @@ void Player::setKey(TCHAR left, TCHAR right, TCHAR up, TCHAR down, TCHAR hand, T
 void Player::checkKey(){
 	if ((state & PS_ATTACK_CANCEL) != PS_ATTACK_CANCEL){
 		if (GetKeyState(hand) < 0){
-			if ((GetKeyState(down) < 0)){
+			int manaConsumption = 50;
+			int manaConsumption2 = 650;
+
+			if ((GetKeyState(down) < 0) && (mana>manaConsumption)){
 				if (((state&PS_ATTACK) != PS_ATTACK) ){
 					state = state|(PS_HAND_ATTACK_UPPERCUT|PS_ATTACK);
+					subMana(manaConsumption);
 				}
 			}
-			else if (((GetKeyState(left) < 0)) && (mana>10)){
+			else if (((GetKeyState(left) < 0)) && (mana>manaConsumption2)){
 				if ((state&PS_DEADLY_BLOW) != PS_DEADLY_BLOW){
 					state = state | (PS_DEADLY_BLOW);
-					subMana(10);
+					subMana(manaConsumption2);
 				}
 			}
-			else if ((GetKeyState(right) < 0) && (mana>10)){
+			else if ((GetKeyState(right) < 0) && (mana>manaConsumption2)){
 				if ((state&PS_DEADLY_BLOW) != PS_DEADLY_BLOW){
 					state = state | (PS_DEADLY_BLOW);
-					subMana(10);
+					subMana(manaConsumption2);
 				}
-			}else if ((state&PS_ATTACK) != PS_ATTACK){
+			}
+			else if (((state&PS_ATTACK) != PS_ATTACK) && (mana>manaConsumption)){
 				state = state | (PS_HAND_ATTACK | PS_ATTACK);
+				subMana(manaConsumption);
 			}
 		}
 		if (GetKeyState(foot) < 0){
-			if ((GetKeyState(down) < 0)){
+			int manaConsumption = 50;
+			if ((GetKeyState(down) < 0)&&(mana>manaConsumption)){
 				if ((state&PS_ATTACK) != PS_ATTACK){
 					state = state | (PS_KNEE_KICK_ATTACK| PS_ATTACK);
+					subMana(manaConsumption);
 				}
-			}else if ((state&PS_ATTACK) != PS_ATTACK){
+			}
+			else if (((state&PS_ATTACK) != PS_ATTACK) && (mana>manaConsumption)){
 				state = state | (PS_FOOT_ATTACK | PS_ATTACK);
+				subMana(manaConsumption);
 			}
 		}
 	}

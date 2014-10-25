@@ -184,9 +184,19 @@ void Engine::physicalProcess(){
 
 	
 	if (player1->getLife() <= 0 || player2->getLife() <= 0){
+		if (player1->getLife() <= 0){
+			player1->base.v.y -= 3;
+			player2->winAnimation();
+		}
+		else{
+			player2->base.v.y -= 3;
+			player1->winAnimation();
+		}
+		/*
 		exitEngine();
 		MessageBox(g_hWnd, TEXT("게임이 끝났습니다. 다시 시작하려면 게임/시작")
 			TEXT(" 항목을 선택해 주십시오."), TEXT("알림"), MB_OK);
+		*/
 	}
 }
 

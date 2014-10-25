@@ -106,6 +106,7 @@ vector findCollisionLineToLine(line l1, line l2){
 		b2.rotation = atan2((l[2].x - l[3].x), (l[2].y - l[3].y));
 	b2.width = { sqrt(pow(l[2].x - l[3].x, 2) + pow(l[2].y - l[3].y, 2)), 2.0 };
 	
+	/*
 	//test¿ë
 	static HDC hdc = GetDC(g_hWnd);
 	static int a = 0;
@@ -115,7 +116,7 @@ vector findCollisionLineToLine(line l1, line l2){
 		drawBox(hdc, b1);
 		drawBox(hdc, b2);
 	}
-	
+	*/
 
 	if (isCollision(b1, b2)){
 		vector l[] = { l1.pE1->position ,
